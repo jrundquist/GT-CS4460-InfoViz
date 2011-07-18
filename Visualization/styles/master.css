@@ -1,0 +1,177 @@
+/** 
+ * Main style sheet for tWhere in Tweet tWorld
+ * 
+ */
+
+/*
+ 	Basic code to reset the styles of all browsers to a nice clean default 
+*/
+
+body { font-family: 'Ubuntu', 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #fff; }
+p { line-height: 25px; color: #333; font-size: 15px }
+a { color: #2b96f1 }
+a:hover { cursor: pointer; }
+#content a:hover{ border-bottom: dotted 1px }
+strong { font-weight: bold }
+em { font-style: italic }
+del { text-decoration: line-through }
+li { text-decoration: none; list-style: none }
+h1,h2,h3,h4,h5,h6 { font-family: "Myriad Pro", "myriad-pro-1","myriad-pro-2", Arial, Sans-Serif; color: #1c1c1c; font-weight: 600 }
+h1 { margin: 0 0 48px 0; font-size: 40px }
+h2 { margin: 0 0 22px; font-size: 28px }
+small {font-size: 50%;}
+h3 { margin: 0 0 18px 0; font-size: 20px }
+h4,h5,h6 { margin: 0 0 8px 0; font-size: 16px }
+input {padding: 0 8px }
+textarea {padding: 4px 11px 4px 9px }
+input, textarea { height: 25px; color: #4e4e4e; border: #cbcbcb 1px solid; font-family: Arial, serif; font-size: 12px }
+.go { width: 20px;}
+code { font-family: Consolas, 'Courier New', Courier, mono, serif;}
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}
+.bold { font-weight: bold; }
+
+
+
+/* Define some fonts */
+
+@font-face {
+    font-family: 'PusabRegular';
+    src: url('fonts/PUSAB___-webfont.eot');
+    src: url('fonts/PUSAB___-webfont.eot?#iefix') format('embedded-opentype'),
+         url('fonts/PUSAB___-webfont.woff') format('woff'),
+         url('fonts/PUSAB___-webfont.ttf') format('truetype'),
+         url('fonts/PUSAB___-webfont.svg#PusabRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+/* 
+	Begin styling code 
+*/
+
+body{
+	font-family:'Ubuntu';
+	background: #F2F2F2;
+}
+
+header h1{
+	margin: 0;
+	font-family:'PusabRegular';
+	font-size: 35px;
+	line-height: 35px;
+	color: #0ff;
+	-webkit-text-stroke: 2px #777;
+	text-stroke: 4px #777;
+}
+
+body header#intro{
+	margin: 0 auto 15px;
+	width: 960px;
+}
+
+header#intro h1{
+	margin: 0;
+	font-family:'PusabRegular';
+	font-size: 71px;
+	line-height: 71px;
+	color: #0ff;
+	-webkit-text-stroke: 4px #fff;
+	text-stroke: 4px #fff;
+	text-shadow: 0 0 40px #ABABAB;
+	
+}
+header#intro h2{
+	text-align: center;
+	width: auto;
+	padding: 4px;
+	background: #EBFFC4;
+	font-family:'Ubuntu';
+	color: #555;
+	box-shadow: -1px 1px 10px #999, 0 0 5px #fff;
+	border: 4px solid #fff;
+	border-radius: 10px;
+}
+
+
+
+article[role="main"]{
+	width: 1550px;
+	margin: 10px auto;
+	clear: both;
+	position: relative;
+}
+
+section#geo-map {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 1000px;
+}
+
+article#filters{
+	border: 1px solid #fff inset;
+	position: relative;
+}
+
+section#lang-filter{
+	position: relative;
+	width: 300px;
+	min-height: 200px;
+}
+section#lang-filter header{
+	height: 20px;
+}
+section#lang-filter header h2{
+	font-family: 'Ubuntu';
+	font-size: 18px;
+}
+
+#lang-filter label{
+	display: inline;
+	width: 50px;
+	clear: both;
+}
+#lang-options{
+	position: relative;
+}
+#lang-options div#left-col-choices{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+#lang-options div#right-col-choices{
+	position: absolute;
+	top: 0px;
+	left: 150px;
+}
+
+
+
+
+
+
+
+canvas#twit-vis{
+	position:relative;
+	cursor: pointer;
+	width: inherit;
+	height: inherit;
+	z-index: 1002;
+}
+section#tooltip{
+	position:absolute;
+	display:none;
+	top:0;
+	left:0;
+	border: 2px solid #FDFDFD;
+	border-radius: 10px;
+	border-top-left-radius: 0;
+	box-shadow: 0 0 5px #888, 0 0 3px #000 inset;
+	text-shadow: -1px 0 0 #fff;
+	padding: 5px;
+	min-width: 100px;
+	max-width: 300px;
+	min-height: 20px;
+	background: #FEF0CA;
+}

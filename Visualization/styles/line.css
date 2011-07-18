@@ -1,0 +1,20 @@
+path {
+stroke: steelblue;
+stroke-width: 2;
+fill: none;
+}
+
+path.1 {
+stroke: red;
+stroke-width: 2;
+fill: none;
+}
+ 
+line {
+stroke: black;
+}
+ 
+text {
+font-family: sans-serif;
+font-size: 9pt;
+}

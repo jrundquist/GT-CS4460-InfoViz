@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <title>Worker example: One-core computation</title>
+ </head>
+ <body>
+  <p>Testing some worker: <output id="result"></output></p>
+  <script>
+	var worker = new Worker('worker.js');
+
+	worker.onmessage = function (event) {
+		console.log(event);
+		document.getElementById('result').textContent = event.data;
+	};
+
+	worker.postMessage("start");
+  </script>
+ </body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>TwitViz Map Demo</title>
+	<script src="scripts/jquery.min.js"></script>
+	<script src="scripts/jquery-ui.min.js"></script>
+	<script src="scripts/jquery-ui.slider.rangeDrag.js"></script>
+	<script src="scripts/d3/d3.js"></script>
+	<script src="scripts/twitVis.js"></script>
+	<script src="scripts/slider.js"></script>
+	<script src="scripts/master.js"></script>
+    <script src="scripts/time-lang.json"></script>
+	<script src="scripts/line.js"></script>
+
+	<link href="styles/jquery-ui.css" type='text/css' rel='stylesheet' />
+	<link href="styles/master.css" type='text/css' rel='stylesheet' />
+	<link href="styles/slider.css" type='text/css' rel='stylesheet' />
+	<link href="styles/line.css" type="text/css" rel="stylesheet"/>
+	
+	<!-- Font for ubuntu -->
+	<link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400,700&v2' rel='stylesheet' type='text/css'>
+	
+	
+
+
+</head>
+<body>
+	<header id="intro">
+		<h1>tWhere in Tweet tWorld</h1>
+		<h2>Visualizing Global Twitter Data</h2>
+	</header>
+	
+	<article role="main">
+		
+		<!-- Data map showing the geographic data -->
+		<section id="geo-map">
+			<!-- map image for map -->
+			<img id="map-image" type="image/svg+xml" style="display:none;" src="img/equirectangular_two.svg"/>
+			<!-- Tooltip -->
+			<section id="tooltip">
+			</section>
+			<!-- map canvas -->
+			<canvas id="twit-vis" width="1000" height="416" ><!-- 960x400 -->
+			</canvas>
+
+			<!-- controls -->
+			<section id="map-controls">
+				<div id="sliderHus">
+					<div id="slider"></div> 
+					<div id="scale">
+						<div id="scaleBars"></div>
+						<div id="scaleNums"></div>
+					</div>
+				</div>
+				<section id="slider-info">
+					<section id="values-display">
+						<div class="slider-text" id="from"></div>
+						to
+						<div class="slider-text" id="to"></div> GMT
+					</section>
+				</section>
+			</section>
+			
+			<section id="trend">
+				<div id="effin-graph"></div>
+			</section>
+		</section>
+		
+		<article id="filters">
+			<header>
+				<h1>Filter Tweet Data</h1>
+			</header>
+			<section id="lang-filter">
+				<header>
+					<h3>Select Languages</h3>
+				</header>
+				<div id="lang-options">
+					<form id="lang-form">
+					<div id="left-col-choices">
+						<div id="rad-option"><input type="checkbox" name="en" value="en" id="en-box" checked="true"/><label for="en-box">English</label></div>
+						<div id="rad-option"><input type="checkbox" name="fr" value="fr" id="fr-box" checked="true"/><label for="fr-box">French</label></div>
+						<div id="rad-option"><input type="checkbox" name="de" value="de" id="de-box" checked="true"/><label for="de-box">German</label></div>
+						<div id="rad-option"><input type="checkbox" name="it" value="it" id="it-box" checked="true"/><label for="it-box">Italian</label></div>
+						<div id="rad-option"><input type="checkbox" name="ja" value="ja" id="ja-box" checked="true"/><label for="ja-box">Japanese</label></div>
+					</div>
+					<div id="right-col-choices">
+						<div id="rad-option"><input type="checkbox" name="ko" value="ko" id="ko-box" checked="true"/><label for="ko-box">Korean</label></div>
+						<div id="rad-option"><input type="checkbox" name="pt" value="pt" id="pt-box" checked="true"/><label for="pt-box">Portuguese</label></div>
+						<div id="rad-option"><input type="checkbox" name="ru" value="ru" id="ru-box" checked="true"/><label for="ru-box">Russian</label></div>
+						<div id="rad-option"><input type="checkbox" name="es" value="es" id="es-box" checked="true"/><label for="es-box">Spanish</label></div>
+						<div id="rad-option"><input type="checkbox" name="tr" value="tr" id="tr-box" checked="true"/><label for="tr-box">Turkish</label></div>
+					</div>
+					</form>
+				</div>
+			</section>
+		</article>
+		
+		<section id="chart">
+			<h2>Chart will go here</h2>
+		</section>
+	
+		<!-- <section id="trend">
+			<h2>Trend chart will go here</h2>
+			<div id="effin-graph"></div>
+			<div id="langColor"></div>
+			
+		</section> -->
+		
+		<footer>
+		</footer>
+		
+	</article>
+	
+	
+	<footer>
+	</footer>
+	
+	<script>	
+		$(document).ready(function(){
+			window.vizMap = tv.map(null, $('#map-image')).draw();
+			// //mapPlay(0, 0, 0, 0);
+			$('#lang-form input[type="checkbox"]').each(function(){
+				$(this).change(function(){
+					window.vizMap.updateData(null, null, null, null);
+				});
+			});
+			window.vizMap.updateData(6, 00, 7, 00);
+			
+			$('#effin-graph').d3InitEffingLineGraph({languages: langs, data: rawData, width:960, height:200});
+			
+		});
+	</script>
+	
+</body>
+</html>

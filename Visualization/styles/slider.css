@@ -1,0 +1,63 @@
+.ui-slider-horizontal 
+{
+	height: .8em;
+}
+
+.ui-slider 
+{
+	position: relative;
+	text-align: left;
+}
+
+section#map-controls{
+	width: inherit;
+	border-bottom: 2px solid #999;
+	border-radius: 20px;
+}
+
+#sliderHus
+{
+	width: inherit;
+	position: relative;
+}
+
+section#slider-info{
+	margin-top: 30px;
+	text-align: center;
+}
+section#slider-info .slider-text{
+	display: inline;
+	font-size: 18px;
+	text-shadow: -1px 0 #AAA;
+}
+section#slider-info button{
+	margin: 5px 20px;
+}
+.scaleTick
+{
+	position: absolute;
+	display: inline;
+	color: #AAA;
+	font-size: .8em;
+	text-align:left;
+}
+
+
+#slider{ 
+	width: 100%;
+}
+#slider .ui-slider-range
+{
+	background: #66d9d9;
+	cursor: pointer;
+}
+
+#slider .ui-slider-handle
+{
+	width: .4em;
+	margin-left: -.2em;
+	border-color: #66d9d9;
+	box-shadow: 0 0 2px #66d9d9 inset;
+}
+
+/*66d9d9*/
