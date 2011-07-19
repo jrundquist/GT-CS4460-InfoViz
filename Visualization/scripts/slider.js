@@ -108,6 +108,30 @@ $(function()
 		//Updates bottom text
 		$('.slider-text#from').html(getTime(value[0]));
 		$('.slider-text#to').html(getTime(value[1]));
+		
+		if ( $('#effin-graph > svg').length){
+			viz = $('#effin-graph').data('viz');
+			if ( !$('#effin-graph > svg > rect').length ){
+				console.log(viz.options);
+				var svgDocument = $('#effin-graph > svg')[0];
+				var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+				rect.setAttributeNS(null, "x", 0)
+				rect.setAttributeNS(null, "y", 0)
+				rect.setAttributeNS(null, "width",  0)
+				rect.setAttributeNS(null, "height",  0)
+				rect.setAttributeNS(null, "fill", "#0ff")
+				rect.setAttributeNS(null, "opacity", ".2")//stroke="black" stroke-width="2"
+				rect.setAttributeNS(null, "stroke", "#000")
+				rect.setAttributeNS(null, "stroke-width", "2");
+				svgDocument.appendChild(rect);
+			}
+			width_mult = (viz.options.width-viz.options.padding)/$('#slider').dragslider('option', 'max');
+			rect = $('#effin-graph > svg > rect');
+			rect.attr('x', (parseInt(viz.options.padding) + 0 + parseInt(value[0])*width_mult));
+			rect.attr('y', 0);
+			rect.attr('width', (value[1]-value[0])*width_mult);
+			rect.attr('height', viz.options.height-0-parseInt(viz.options.padding));
+		}
 		//console.log(value);
 	}
 	

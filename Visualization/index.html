@@ -6,11 +6,15 @@
 	<script src="scripts/jquery-ui.min.js"></script>
 	<script src="scripts/jquery-ui.slider.rangeDrag.js"></script>
 	<script src="scripts/d3/d3.js"></script>
+	<script src="scripts/d3/d3.layout.js"></script>
+    
 	<script src="scripts/twitVis.js"></script>
 	<script src="scripts/slider.js"></script>
 	<script src="scripts/master.js"></script>
-    <script src="scripts/time-lang.json"></script>
+	
+  <!-- 	<script src="ajax/lang-trends.php" type="text/javascript"></script> -->
 	<script src="scripts/line.js"></script>
+	<script src="scripts/pie.js"></script>
 
 	<link href="styles/jquery-ui.css" type='text/css' rel='stylesheet' />
 	<link href="styles/master.css" type='text/css' rel='stylesheet' />
@@ -96,17 +100,12 @@
 		</article>
 		
 		<section id="chart">
-			<h2>Chart will go here</h2>
+			<h2>Languages</h2>
+			<div id="pie"></div>
 		</section>
-	
-		<!-- <section id="trend">
-			<h2>Trend chart will go here</h2>
-			<div id="effin-graph"></div>
-			<div id="langColor"></div>
-			
-		</section> -->
 		
 		<footer>
+			&copy;
 		</footer>
 		
 	</article>
@@ -122,12 +121,23 @@
 			$('#lang-form input[type="checkbox"]').each(function(){
 				$(this).change(function(){
 					window.vizMap.updateData(null, null, null, null);
+					
+					$.ajax({
+						url: 'ajax/lang-trends.php',
+						dataType: 'json',
+						data: {lang:$('form#lang-form').serialize()},
+						success: function(rawData){
+							$('#effin-graph').html('').d3InitEffingLineGraph({languages: langs, data: rawData, width:980, height:200});
+						}
+					});
+					
 				});
 			});
+			
 			window.vizMap.updateData(6, 00, 7, 00);
-			
-			$('#effin-graph').d3InitEffingLineGraph({languages: langs, data: rawData, width:960, height:200});
-			
+			$('#lang-form input[type="checkbox"]').first().change();
+			$('#pie').d3InitPieGraph({languages: langs, width: 500, height: 600, radius: 250});
+
 		});
 	</script>
 	

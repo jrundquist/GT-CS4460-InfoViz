@@ -1,20 +1,20 @@
-path {
+#effin-graph > svg > g > path {
 stroke: steelblue;
 stroke-width: 2;
 fill: none;
 }
 
-path.1 {
+#effin-graph > svg > g > path.1 {
 stroke: red;
 stroke-width: 2;
 fill: none;
 }
  
-line {
+#effin-graph > svg > g > line {
 stroke: black;
 }
  
-text {
+#effin-graph > svg > g > text {
 font-family: sans-serif;
 font-size: 9pt;
 }

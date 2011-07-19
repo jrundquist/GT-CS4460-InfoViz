@@ -153,8 +153,6 @@ tv.Map = function(canvas, image){
 		return;
 	}
 	
-	
-	console.log(this.canvas);
 	// Set the image
 	this.globe = image[0];
 	
@@ -173,8 +171,6 @@ tv.Map = function(canvas, image){
 	this.canvas.height = Math.round((this.globe.height/this.globe.width)*this.canvas.width);
 	//$(this.canvas).height(this.canvas.height);
 	
-	
-	console.log(this.canvas.height, this.canvas.height);
 	//this.canvas.s_width = this.canvas.width;
 	//this.canvas.s_height = this.canvas.height
 	this.canvas.x_offset = 0;
@@ -348,11 +344,11 @@ tv.Map.prototype.drawData = function(){
 	
 	try { 
 		if ( typeof(this.data[0]) !== 'object' ){
-			console.log('data not of type array');
+			//console.log('data not of type array');
 			return;
 		}
 	}catch(e){
-		console.log('no data');
+		//console.log('no data');
 		return;
 	}
 	
@@ -370,7 +366,6 @@ tv.Map.prototype.drawData = function(){
 	max_y = canvas.view_height*canvas.view_scale;
 	
 	if ( this.canvas.view_scale || 1.5 ) {
-		//console.log('plotting data points');
 		
 		for(var index in this.data){
 			point = this.data[index];
@@ -417,7 +412,6 @@ tv.Map.prototype.drawData = function(){
 			ctx.globalAlpha = 1;
 		}
 	}else{
-		console.log('plotting chunked data points');
 		
 		this.ctx.globalAlpha = 1;
 		
@@ -453,11 +447,9 @@ tv.Map.prototype.drawData = function(){
  */
 tv.Map.prototype.chunkComplete = function (event) {
 	if ( event.data.status == 'error' ){
-		console.log('Worker Error : '+event.data.message, event);
 	}else if ( event.data.status == 'chunked' ){
 		document.getElementById('result').textContent += '   Chunk Complete : Reduced to '+event.data.result.length+' points';
 		this.map.chunk = event.data.result;
-		console.log('Chunk Complete : Reduced to '+event.data.result.length+' points');
 		this.map.canvas.changed = true;
 		this.map.tick();
 		
@@ -487,19 +479,25 @@ tv.Map.prototype.addDataPoint = function(dat){
 }
 
 
-tv.Map.prototype.showDetailsFor = function(data, x, y){	
-	lon = (point.lon)/180;
-	lat = (-point.lat)/90;
+tv.Map.prototype.showDetailsFor = function(data){	
+	
+	canvas = this.canvas;
+	
+	lon = (data.lon)/180;
+	lat = (-data.lat)/90;
 	lat = lat*((canvas.height/canvas.width))*2;
 
-	point.x = (lon+1)*canvas.width/2;
-	point.y = (lat+1)*canvas.height/2;
+	off_x = (canvas.x_offset/canvas.view_width)*canvas.width;
+	off_y = (canvas.y_offset/canvas.view_height)*canvas.height;
+	
+	data.x = (lon+1)*canvas.width/2;
+	data.y = (lat+1)*canvas.height/2;
 
-	p_x = (point.x*canvas.view_scale) - off_x;
-	p_y = (point.y*canvas.view_scale) - off_y;
+	p_x = (data.x*canvas.view_scale) - off_x;
+	p_y = (data.y*canvas.view_scale) - off_y;
 	
 	
-	$('section#tooltip').css({'top':p_y+8, 'left':p_x+8}).html("<section><strong>Text:</strong> "+data.tweet.text+"</section><section><strong>Lang:</strong> "+data.tweet.lang+"</section><section><strong>Tweeted on:</strong> "+data.tweet.created_at+"</section>").fadeIn();
+	$('section#tooltip').css({'top':p_y+1, 'left':p_x+1}).html("<section><strong>Text:</strong> "+data.tweet.text+"</section><section><strong>Lang:</strong> "+data.tweet.lang+"</section><section><strong>Tweeted on:</strong> "+data.tweet.created_at+"</section>").fadeIn();
 }
 
 
@@ -553,13 +551,19 @@ tv.Map.prototype.mouseClick = function (event){
 	$('section#tooltip').hide();
 	
 	var mousex = event.clientX - $(this).offset().left;
-    var mousey = event.clientY - $(this).offset().top;	
+    var mousey = event.clientY - $(this).offset().top;
 	var canvas = this.map.canvas;
 	
 	off_x = (canvas.x_offset/canvas.view_width)*canvas.width;
 	off_y = (canvas.y_offset/canvas.view_height)*canvas.height;
 	
-	for(var index in this.map.data){
+	options = [];
+	
+	
+	min_d = canvas.width * 2;
+	min_index = -1;
+	
+	for(var index=0; index<this.map.data.length; index++){
 		point = this.map.data[index];
 
 		lon = (point.lon)/180;
@@ -569,21 +573,23 @@ tv.Map.prototype.mouseClick = function (event){
 		point.x = (lon+1)*canvas.width/2;
 		point.y = (lat+1)*canvas.height/2;
 	
-		p_x = (point.x*canvas.view_scale) - off_x;
-		p_y = (point.y*canvas.view_scale) - off_y;
-	
-		if ( p_x < 0 || p_x > max_x || p_y < 0 || p_y > max_y ){
-			continue;
-		}
-		
-		//console.log(p_x);
-		
-		var tol = point.size + 30;
+		point.p_x = (point.x*canvas.view_scale) - off_x;
+		point.p_y = (point.y*canvas.view_scale) - off_y;
 
-		if ( p_x + tol >= mousex && p_x - tol <= mousex && p_y + tol >= mousey && p_y - tol <= mousey ){
-			this.map.showDetailsFor(point, mousex, mousey);
+		tol = 15;
+		
+		d = Math.sqrt(Math.pow(point.p_x - mousex,2)+Math.pow(point.p_y - mousey,2));
+		if ( d < tol && d < min_d ){
+			min_d = d;
+			min_index = index;
 		}
 	}
+	if(min_index == -1) return;
+	
+	console.log('showing ', this.map.data[min_index]);
+	this.map.showDetailsFor(this.map.data[min_index]);
+	
+	
 }
 
 tv.Map.prototype.mouseDown = function (event){

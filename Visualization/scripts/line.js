@@ -9,8 +9,9 @@
 		   		data: null,
 		   		width: 850,
 		   		height: 180,
-		   		padding: 25,
-				what: this.selector
+		   		padding: 30,
+				what: this.selector,
+				self: this
 		 		};
 		
 		var options = $.extend(defaults, options);
@@ -18,13 +19,17 @@
 		
 		function getYMax(d)//Gets the max y values across all languages to scale graph
 		{
-			var maxList = [];
-			if (!d) return 0;
+			max = 0;
 			for (var i=0; i < d.length; i++) 
 			{
-				maxList.push(d3.max(d[i]));
+				lm = 0;
+				for(var j=0; j < d[i].length; j++){
+					a = parseInt(d[i][j]);
+					lm = lm<a?a:lm;
+				}
+				max = max<lm?lm:max;
 			}
-			return d3.max(maxList);
+			return max;
 		}
 		
 		function parseData(rawData) {
@@ -45,7 +50,7 @@
 				if(currentLang != rawData[i].lang)//if there is a language change
 				{
 					currentLang = rawData[i].lang;
-					while(minNum < 288)//fill in rest of last language with zeros
+					while(minNum < rawData[1].length)//fill in rest of last language with zeros
 					{
 						data[currentSlot].push(0);
 						minNum++;
@@ -57,7 +62,7 @@
 					hour = 0;
 					min = 0;
 				}
-				while((min != rawData[i].minute) && (hour != rawData[i].hour) && (minNum < 288))//fills in missing time periods with 0s
+				while((min != rawData[i].minute) && (hour != rawData[i].hour) && (minNum < rawData[1].length))//fills in missing time periods with 0s
 				{
 					data[currentSlot].push(0);
 					minNum++;
@@ -89,48 +94,58 @@
 
 			x = d3.scale.linear().domain([0, ddata[0].length]).range([0 + options.padding, options.width - options.padding]),//sets scale
 		    y = d3.scale.linear().domain([0, getYMax(ddata)]).range([0 + options.padding, options.height - options.padding]);
-		
+				
 			// Create the d3 object
-			this.vis = d3.select(options.what)
+			obj.vis = d3.select(options.what)
 						.append("svg:svg")
 						.attr("width",options.width)
 						.attr("height",options.height);
+			obj.vis.options = options;
 				
-			this.g = this.vis.append("svg:g")
+			obj.g = obj.vis.append("svg:g")
 						.attr("transform","translate(0,"+options.height+")");
 						
-			this.line = d3.svg.line()//helper function to create line
+			obj.line = d3.svg.line()//helper function to create line
 						.x(function(d,i){return x(i);})
 						.y(function(d){return -1 * y(d);})//-1 to account for translation
 
 			for (var i=0; i < ddata.length; i++) //adds line for each language
 			{
-				this.g.append("svg:path")
-						.attr("d", this.line(ddata[i]))
+				obj.g.append("svg:path")
+						.attr("d", obj.line(ddata[i]))
+						.attr('id', 'lang-line-'+dmap[''+i].lang)
 						.style("stroke",dmap[''+i].color.replace("#", ""));
 			};
 			
-			this.g.append("svg:line")//x axis
+			obj.g.append("svg:line")//x axis
 					.attr("x1", x(0))
 					.attr("y1", -1 * y(0))
 					.attr("x2", x(options.width))
-					.attr("y2", -1 * y(0));
-			
-			this.g.append("svg:line")//y axis
+					.attr("y2", -1 * y(0))
+					.style("stroke",'#fff');;
+
+			obj.g.append("svg:line")//y axis
 					.attr("x1", x(0))
 					.attr("y1", -1 * y(0))
 					.attr("x2", x(0))
-					.attr("y2", -1 * y(getYMax(ddata)));
+					.attr("y2", -1 * y(getYMax(ddata)))
+					.style("stroke",'#fff');;
 			
-			this.g.selectAll(".yLabel")//y axis labels
+			obj.g.selectAll(".yLabel")//y axis labels
 					.data(y.ticks(4))
 					.enter().append("svg:text")
 					.text(String)
-					.attr("x", 0)
+					.attr("x", 4)
 					.attr("y", function(d) { return -1 * y(d) })
 					.attr("text-anchor", "right")
+					.attr('color', '#fff')
+					.attr('stroke', '#fff')
 					.attr("dy", 4);
+			obj.data('viz',obj.vis);
 		});
+		
+		this.ddata = ddata;
+		
 		
 	};
 })(jQuery);

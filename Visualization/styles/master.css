@@ -102,12 +102,97 @@ article[role="main"]{
 	position: relative;
 }
 
+
+
+/* Styles for the map */
+
+
 section#geo-map {
 	position: absolute;
 	top: 0;
 	right: 0;
 	width: 1000px;
+	box-shadow: 0 0 20px #555 !important;
 }
+section#geo-map canvas#twit-vis{
+	position:relative;
+	cursor: pointer;
+	width: inherit;
+	height: inherit;
+	z-index: 1002;
+}
+section#map-controls{
+	width: inherit;
+	border-bottom: 2px solid #999;
+	background: #555;
+	color: #ccc;
+	padding: 4px 0;
+}
+#sliderHus
+{
+	width: 900px;
+	margin: 0 auto;
+	position: relative;
+}
+section#slider-info{
+	margin-top: 30px;
+	text-align: center;
+}
+section#slider-info .slider-text{
+	display: inline;
+	font-size: 20px;
+	text-shadow: -1px 0 #fff;
+	color: #ddd;
+}
+section#slider-info button{
+	margin: 5px 20px;
+}
+div#scaleNums .scaleTick{
+	text-indent: -1em;
+}
+
+
+
+
+
+
+/* Styles for the language pie chart */
+
+
+section#chart {
+	padding-top: 20px;
+	background: #555;
+	box-shadow: 0 0 20px #555 !important;
+	width: 500px;
+	height: 500px;
+}
+
+section#chart h2{
+	color: #fff;
+	margin: 0 auto;
+	width: 200px;
+	text-align: center;
+}
+section#chart div#pie{
+	width: inherit;
+}
+section#chart div#pie svg{
+	width: 500px;
+}
+
+
+
+
+section#trend{
+	background: #555 !important;
+	box-shadow: 0 0 20px #555 !important;
+}
+
+div#effin-graph{
+	width: 980px;
+	margin: 0 auto;
+}
+
 
 article#filters{
 	border: 1px solid #fff inset;
@@ -152,15 +237,10 @@ section#lang-filter header h2{
 
 
 
-canvas#twit-vis{
-	position:relative;
-	cursor: pointer;
-	width: inherit;
-	height: inherit;
-	z-index: 1002;
-}
+
 section#tooltip{
 	position:absolute;
+	z-index: 1003;
 	display:none;
 	top:0;
 	left:0;

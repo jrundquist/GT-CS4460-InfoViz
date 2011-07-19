@@ -9,30 +9,6 @@
 	text-align: left;
 }
 
-section#map-controls{
-	width: inherit;
-	border-bottom: 2px solid #999;
-	border-radius: 20px;
-}
-
-#sliderHus
-{
-	width: inherit;
-	position: relative;
-}
-
-section#slider-info{
-	margin-top: 30px;
-	text-align: center;
-}
-section#slider-info .slider-text{
-	display: inline;
-	font-size: 18px;
-	text-shadow: -1px 0 #AAA;
-}
-section#slider-info button{
-	margin: 5px 20px;
-}
 .scaleTick
 {
 	position: absolute;
