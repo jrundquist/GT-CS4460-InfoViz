@@ -14,6 +14,10 @@
 		 		};
 		var options = $.extend(defaults, options);
 			
+			
+		
+		
+		
 		return this.each(function(){
 			this.options = options;
 			
@@ -30,18 +34,17 @@
 				percentData[i] = parseInt(this.options.data[i].data.count)/total;
 			
 		    pieData = d3.layout.pie().sort(d3.descending);
-		    arc = d3.svg.arc().innerRadius(this.options.radius * 0).outerRadius(this.options.radius*.7); // affects inner and outer radii
+		
+		
+		
+		    arc = d3.svg.arc().innerRadius(this.options.radius * 0).outerRadius(this.options.radius*.8); // affects inner and outer radii
 				
 			var vis = d3.select(this.options.what)
 						    .append("svg:svg")
 						    .data([percentData])
 						    .attr("width", this.options.width)
 						    .attr("height", this.options.height);
-			var tooltip = d3.select("body")
-					 		.append("div")
-					 		.style("position", "absolute")
-					 		.style("z-index", "10")
-					 		.style("visibility", "hidden");
+			var tooltip = $('#tooltip');
 			
 			var arcs = vis.selectAll("g.arc")
 						    .data(pieData)
@@ -53,21 +56,31 @@
 			var paths = arcs.append("svg:path")
 							.attr("fill", function(d, i) { return options.languages[options.data[i].name].color; }) // fills the pie piece with the color corresponding to the language
 						    .attr("d", arc)
+							.attr("class", "pie-piece")
+							.attr("id", function(d, i) { return 'pie-piece-'+options.languages[options.data[i].name].abbr; })
 							// animate the color of the pie piece outline when moused over, set the tooltip to visible
-							.on("mouseover", function(d,i) { d3.select(this).transition().duration(0)
-								.attr("stroke","#000") // defines color  of selected pie piece outline
-								.attr("stroke-width", "1.75") // defines width of selected pie piece outline
-								return tooltip.style("visibility", "visible")}) // sets the tooltip to visible
+							.on("mouseover", function(d,i) {
+									brushLang(options.languages[options.data[i].name].abbr);
+									return tooltip.stop().fadeIn();
+								}) // sets the tooltip to visible
 							// define the location of the tooltip and define the text displayed in the tooltip
-							.on("mousemove", function(d, i){return tooltip
-								.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px") // defines location of tooltip
-								.text(options.languages[options.data[i].name].name + ":   " + options.data[i].data.count + " tweets" + 
-								 	", " + (d.value*100).toFixed(3) + "%"); }) // defines text of tooltip
+							.on("mousemove", function(d, i){
+								 	return tooltip
+									.css({opacity: 1, top:(event.clientY + $(window).scrollTop()+10),left:(event.clientX+10)}) // defines location of tooltip
+									.html('<section><strong>'+options.languages[options.data[i].name].name + ": </strong>" + options.data[i].data.count + " tweets" + 
+									 	" (" + (d.value*100).toFixed(3) + "%)");
+								}) // defines text of tooltip
 							// return the pie piece outline to its original color when the mouse leaves its area
-							.on("mouseout", function(d,i) { d3.select(this).transition().duration(0)
-								//.attr("fill", color[i])
-								.attr("stroke", null) // removes the outline from the previously selected pie piece
-							 	return tooltip.style("visibility", "hidden"); }); // hides the tooltip when it exits the chart
+							.on("mouseout", function(d,i) { 
+									unBrush(options.languages[options.data[i].name].abbr);
+									d3.select(this).transition().duration(0)
+									//.attr("fill", color[i])
+									.attr("stroke", null) // removes the outline from the previously selected pie piece
+								 	return tooltip.stop().fadeOut();
+								}); // hides the tooltip when it exits the chart
+		
+			vis.arcs 	= arcs;
+			vis.paths 	= paths;
 		
 			$(this).data('viz', vis);
 			$(this).data('tooltip-div',tooltip);
@@ -89,21 +102,7 @@
 			}
 			
 			
-			 function arcTween(a) {
-				var i = d3.interpolate({x: a.x0, dx: a.dx0}, a);
-				return function(t) {
-					var b = i(t);
-					a.x0 = b.x;
-					a.dx0 = b.dx;
-					return arc(b);
-				};
-			}
-	
-	
-				path.data(partition.value(function(d) { return 1; }))
-					.transition()
-					.duration(1500)
-					.attrTween("d", arcTween);
+
 			
 		});
 	}

@@ -143,6 +143,34 @@ tv.map = function(data, image){
  * Assigns the DOM object and the data
  */
 tv.Map = function(canvas, image){
+	
+	
+	/* Set up some storage */
+	
+	
+	var shortName = 'TwitViz';
+    var version = '1.0';
+    var displayName = 'Twitter data cache';
+    var maxSize = 3072*1024*10; //  = 30MB            in bytes 655360
+    this.db = openDatabase(shortName, version, displayName, maxSize);
+
+
+
+	this.db.transaction(
+        function(tx) {
+            tx.executeSql("SELECT COUNT(*) FROM MapCache", [], null,
+                function(tx, error) {
+                    tx.executeSql("CREATE TABLE MapCache (key TEXT, data TEXT)", [], null, null);
+                }
+            );
+        }
+    );
+	
+	
+	
+	
+	
+	
 	this.filter = {};
 	this.canvas  = canvas || document.getElementById('twit-vis');
 	if ( this.canvas == undefined ){
@@ -222,6 +250,7 @@ tv.Map = function(canvas, image){
 };
 
 
+tv.Map.prototype.db = null;
 tv.Map.prototype.data = new Array();
 tv.Map.prototype.data_chunk = new Array();
 tv.Map.prototype.canvas = new Object();
@@ -272,27 +301,54 @@ tv.Map.prototype.updateData = function(hs, ms, he, me){
 
 	sendData.lang = $('form#lang-form').serialize();
 
+	cacheKey = 'mapv1'+JSON.stringify(sendData);
+
 	v = this;
-	$.ajax({
-		url:  '/ajax/lang-map.php',
-		data: sendData,
-		dataType: 'json',
-		success: function(r){
-			v.setData([]);
-			for( i=0; i<r.length; i++){
-				d = {};
-				d.lat 	= r[i].data.tweet.lng;
-				d.lon 	= r[i].data.tweet.lat;
-				d.size 	= 5;
-				d.color = langs[r[i].data.tweet.lang].color;
-				d.tweet = r[i].data.tweet;
-				v.addDataPoint(d);
-			}
-			v.canvas.changed = true;
-			v.draw();
-		}
-	});
-	
+
+
+    this.db.transaction(
+        function(tx) {
+            tx.executeSql("SELECT `data` FROM MapCache WHERE `key`=?", [cacheKey],
+                function(tx, result) {
+					if (result.rows.length){
+						data = JSON.parse(result.rows.item(result.rows.length-1)['data']);
+						console.log('cache hit on data');
+						v.data = data;
+						v.canvas.changed = true;
+						v.draw();
+                    }else{
+						console.log('cache miss');
+						$.ajax({
+							url:  '/ajax/lang-map.php',
+							data: sendData,
+							dataType: 'json',
+							success: function(r){
+								v.setData([]);
+								for( i=0; i<r.length; i++){
+									d = {};
+									d.lat 	= r[i].data.tweet.lng;
+									d.lon 	= r[i].data.tweet.lat;
+									d.size 	= 5;
+									d.color = langs[r[i].data.tweet.lang].color;
+									d.tweet = r[i].data.tweet;
+									v.addDataPoint(d);
+								}
+
+								v.db.transaction(
+							        function(tx) {
+							            tx.executeSql("INSERT INTO MapCache (`key`, `data`) values(?, ?)", [cacheKey, JSON.stringify(v.data)], null, null);
+							        }
+							    );
+
+								v.canvas.changed = true;
+								v.draw();
+							}
+						});
+					}
+                }, null);
+            }
+        );
+
 }
 
 /** 
@@ -340,7 +396,7 @@ tv.Map.prototype.drawMap = function(){
  */ 
 tv.Map.prototype.drawData = function(){
 	
-	$('section#tooltip').fadeOut();
+	$('section#tooltip').hide();
 	
 	try { 
 		if ( typeof(this.data[0]) !== 'object' ){
@@ -364,98 +420,60 @@ tv.Map.prototype.drawData = function(){
 		
 	max_x = canvas.view_width*canvas.view_scale;
 	max_y = canvas.view_height*canvas.view_scale;
+			
+	for(var index in this.data){
+		point = this.data[index];
+
+		ctx.globalAlpha = .8;
+
+		lon = (point.lon)/180;
+		lat = (-point.lat)/90;
+		lat = lat*((canvas.height/canvas.width))*2;
+
+		point.x = (lon+1)*canvas.width/2;
+		point.y = (lat+1)*canvas.height/2;
 	
-	if ( this.canvas.view_scale || 1.5 ) {
-		
-		for(var index in this.data){
-			point = this.data[index];
+		p_x = (point.x*canvas.view_scale) - off_x;
+		p_y = (point.y*canvas.view_scale) - off_y;
 
-			ctx.globalAlpha = .8;
-
-			lon = (point.lon)/180;
-			lat = (-point.lat)/90;
-			lat = lat*((canvas.height/canvas.width))*2;
-
-			point.x = (lon+1)*canvas.width/2;
-			point.y = (lat+1)*canvas.height/2;
-		
-			p_x = (point.x*canvas.view_scale) - off_x;
-			p_y = (point.y*canvas.view_scale) - off_y;
-
-			this.ctx.fillStyle = point.color || '#0ff';
-		
-			if ( p_x < 0 || p_x > max_x || p_y < 0 || p_y > max_y ){
-				continue;
-			}
-		
-		
-			mult = point.size || 2;
-		
-			ctx.fillRect(p_x-p_s*mult, p_y-p_s*mult, p_s*2*mult, p_s*2*mult); 
-		
-			if ( canvas.view_scale || 10 ){
+		this.ctx.fillStyle = point.color || '#0ff';
 	
-				ctx.globalAlpha = 0.1;
+		if ( p_x < 0 || p_x > max_x || p_y < 0 || p_y > max_y ){
+			continue;
+		}
+	
+	
+		mult = point.size || 2;
 		
+		mult = Math.min(8, 25/canvas.view_scale);
+	
+		ctx.fillRect(p_x-p_s*mult, p_y-p_s*mult, p_s*2*mult, p_s*2*mult); 
+	
+		if ( canvas.view_scale || 10 ){
+
+			ctx.globalAlpha = 0.1;
+	
+			ctx.beginPath();
+			ctx.arc(p_x, p_y, p_s*mult*3, 0, Math.PI*2, true);
+			ctx.closePath();
+			ctx.fill();
+	
+			if ( canvas.view_scale > 15 ){
 				ctx.beginPath();
-				ctx.arc(p_x, p_y, p_s*mult*3, 0, Math.PI*2, true);
+				ctx.arc(p_x, p_y, p_s*3, 0, Math.PI*2, true); 
 				ctx.closePath();
 				ctx.fill();
-		
-				if ( canvas.view_scale > 15 ){
-					ctx.beginPath();
-					ctx.arc(p_x, p_y, p_s*3, 0, Math.PI*2, true); 
-					ctx.closePath();
-					ctx.fill();
-				}
 			}
-			ctx.globalAlpha = 1;
 		}
-	}else{
-		
-		this.ctx.globalAlpha = 1;
-		
-		for(var index in this.chunk){
-			point = this.chunk[index];
-		
-			lon = (point.lon)/180;
-			lat = (-point.lat)/90;
-			lat = lat*((canvas.height/canvas.width))*2;
-
-			point.x = (lon+1)*canvas.width/2;
-			point.y = (lat+1)*canvas.height/2;
-		
-			p_x = (point.x*canvas.view_scale) - off_x;
-			p_y = (point.y*canvas.view_scale) - off_y;
-
-			this.ctx.fillStyle = point.color || '#0ff';
-			
-			mult = point.size || 2;
-			this.ctx.beginPath();
-			this.ctx.arc(p_x, p_y, p_s*mult, 0, Math.PI*2); 
-			this.ctx.closePath();
-			this.ctx.fill();
-		}
+		ctx.globalAlpha = 1;
 	}
+		
+		
 	this.ctx.restore();
 
 	return this;
 }
 
-/** 
- * chunkData();
- */
-tv.Map.prototype.chunkComplete = function (event) {
-	if ( event.data.status == 'error' ){
-	}else if ( event.data.status == 'chunked' ){
-		document.getElementById('result').textContent += '   Chunk Complete : Reduced to '+event.data.result.length+' points';
-		this.map.chunk = event.data.result;
-		this.map.canvas.changed = true;
-		this.map.tick();
-		
-		document.write(JSON.stringify(event.data.result));
-	}
-}
 
 /**
  * setData(array)
@@ -493,11 +511,11 @@ tv.Map.prototype.showDetailsFor = function(data){
 	data.x = (lon+1)*canvas.width/2;
 	data.y = (lat+1)*canvas.height/2;
 
-	p_x = (data.x*canvas.view_scale) - off_x;
-	p_y = (data.y*canvas.view_scale) - off_y;
+	p_x = (data.x*canvas.view_scale) - off_x + $(canvas).offset().left;
+	p_y = (data.y*canvas.view_scale) - off_y + $(canvas).offset().top;
 	
 	
-	$('section#tooltip').css({'top':p_y+1, 'left':p_x+1}).html("<section><strong>Text:</strong> "+data.tweet.text+"</section><section><strong>Lang:</strong> "+data.tweet.lang+"</section><section><strong>Tweeted on:</strong> "+data.tweet.created_at+"</section>").fadeIn();
+	$('section#tooltip').stop().fadeIn().css({'top':p_y+1, 'left':p_x+1, 'opacity': 1}).html("<section><strong>Text:</strong> "+data.tweet.text+"</section><section><strong>Lang:</strong> "+data.tweet.lang+"</section><section><strong>Tweeted on:</strong> "+data.tweet.created_at+"</section>").fadeIn();
 }
 
 
@@ -551,7 +569,7 @@ tv.Map.prototype.mouseClick = function (event){
 	$('section#tooltip').hide();
 	
 	var mousex = event.clientX - $(this).offset().left;
-    var mousey = event.clientY - $(this).offset().top;
+    var mousey = event.clientY - $(this).offset().top + $(window).scrollTop();
 	var canvas = this.map.canvas;
 	
 	off_x = (canvas.x_offset/canvas.view_width)*canvas.width;
@@ -559,6 +577,8 @@ tv.Map.prototype.mouseClick = function (event){
 	
 	options = [];
 	
+	max_x = canvas.view_width*canvas.view_scale;
+	max_y = canvas.view_height*canvas.view_scale;
 	
 	min_d = canvas.width * 2;
 	min_index = -1;
@@ -576,6 +596,11 @@ tv.Map.prototype.mouseClick = function (event){
 		point.p_x = (point.x*canvas.view_scale) - off_x;
 		point.p_y = (point.y*canvas.view_scale) - off_y;
 
+		if ( point.p_x < 0 || point.p_x > max_x || point.p_y < 0 || point.p_y > max_y ){
+			continue;
+		}
+		
+
 		tol = 15;
 		
 		d = Math.sqrt(Math.pow(point.p_x - mousex,2)+Math.pow(point.p_y - mousey,2));
@@ -586,7 +611,6 @@ tv.Map.prototype.mouseClick = function (event){
 	}
 	if(min_index == -1) return;
 	
-	console.log('showing ', this.map.data[min_index]);
 	this.map.showDetailsFor(this.map.data[min_index]);
 	
 	
@@ -647,7 +671,7 @@ tv.Map.prototype.mouseDblClick = function (event){
 }
 tv.Map.prototype.mouseWheel = function (event){
     var mousex = event.clientX - $(this).offset().left;
-    var mousey = event.clientY - $(this).offset().top;
+    var mousey = event.clientY - $(this).offset().top + $(window).scrollTop();
     var wheel = event.wheelDelta/120;//n or -n
 
     var zoom = 1 + wheel/2;

@@ -96,7 +96,7 @@ header#intro h2{
 
 
 article[role="main"]{
-	width: 1550px;
+	width: 1515px;
 	margin: 10px auto;
 	clear: both;
 	position: relative;
@@ -198,45 +198,124 @@ article#filters{
 	border: 1px solid #fff inset;
 	position: relative;
 }
+article#filters header h1{
+	width: 500px;
+	text-align: center;
+}
+
 
 section#lang-filter{
 	position: relative;
-	width: 300px;
+	width: 365px;
 	min-height: 200px;
+	margin: 20px 0;
+	padding-top: 10px;
+	background: #555;
+	color: #fff;
+	box-shadow: 0 0 20px #555 !important;
 }
-section#lang-filter header{
-	height: 20px;
-}
-section#lang-filter header h2{
-	font-family: 'Ubuntu';
-	font-size: 18px;
-}
+	section#lang-filter header{
+		height: 10px;
+	}
+	section#lang-filter header h3{
+		font-family: 'Ubuntu';
+		font-size: 25px;
+		color: #fff;
+		width: 250px;
+		text-align: center;
+		margin: 0 auto;
+	}
 
-#lang-filter label{
-	display: inline;
-	width: 50px;
-	clear: both;
-}
-#lang-options{
-	position: relative;
-}
-#lang-options div#left-col-choices{
+	#lang-filter label{
+		display: inline;
+		width: 50px;
+		clear: both;
+		font-size: 18px;
+	}
+	#lang-options{
+		position: relative;
+		margin: 0 auto;
+		background: #555;
+	}
+	#lang-options div#left-col-choices, #lang-options div#right-col-choices{
+		position: absolute;
+		top: 30px;
+		left: 15px;
+	}
+	#lang-options div#right-col-choices{
+		left: 190px;
+	}
+
+	.rad-option {
+		width: 210px;
+		height: 30px;
+		position: relative;
+	}
+	#lang-options .key{
+		border-color: transparent transparent transparent #fff;
+		border-width:15px;
+		border-style: solid;
+		width:0 !important;
+		height:0 !important;
+		display: block;
+		position: absolute;
+		right: 65px;
+		top: 0;
+	}
+	
+section#map-play{
 	position: absolute;
-	top: 0px;
-	left: 0px;
+	width: 120px;
+	height: 200px;
+	margin: 20px 0;
+	padding-top: 10px;
+	background: #555;
+	color: white;
+	box-shadow: 0 0 20px #555 !important;
+	top: 35px;
+	left: 380px;
 }
-#lang-options div#right-col-choices{
-	position: absolute;
-	top: 0px;
-	left: 150px;
+
+	section#map-play header h3{ 
+		font-family: 'Ubuntu';
+		font-size: 20px;
+		color: #fff;
+		width: inherit;
+		text-align: center;
+		margin: 0 auto;
+	}
+
+	section#map-play #controls{
+		text-align: center;
+		width: inherit;
+		margin: 30px auto 0;
+	}
+	section#map-play button{
+		background: #666;
+		border: #0ff solid 2px;
+		box-shadow: 0 0 10px rgba(255,255,255,.5);
+		border-radius: 10px;
+		width: 80px;
+		color: #fff;
+		font-size: 20px;
+		line-height: 25px;
+	}
+	
+	section#map-play button:hover{
+		box-shadow: 0 0 20px rgba(255,255,255,.9), 0 0 10px rgba(0,255,255,.3) inset;
+	}
+	
+	section#map-play button:active{
+		box-shadow: 0 0 20px rgba(255,255,255,.9), 0 0 10px rgba(0,0,0,.5) inset;
+	}
+	
+
+
+
+
+.pie-piece, .lang-line{
+	cursor: pointer;
 }
-
-
-
-
-
-
-
 
 section#tooltip{
 	position:absolute;

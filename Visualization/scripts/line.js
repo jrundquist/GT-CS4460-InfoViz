@@ -113,8 +113,16 @@
 			{
 				obj.g.append("svg:path")
 						.attr("d", obj.line(ddata[i]))
-						.attr('id', 'lang-line-'+dmap[''+i].lang)
-						.style("stroke",dmap[''+i].color.replace("#", ""));
+						.attr('class', 'lang-line')
+						.attr('id', 'lang-line-'+dmap[''+i].abbr)
+						.attr('lang', ''+dmap[''+i].abbr)
+						.style("stroke",dmap[''+i].color.replace("#", ""))
+						.on("mouseover", function(d,j) { 
+							brushLang($(this).attr('lang'));
+						}) // sets the tooltip to visible
+						.on("mouseout", function(d,j) {
+							unBrush($(this).attr('lang'));
+						}); // sets the tooltip to visible
 			};
 			
 			obj.g.append("svg:line")//x axis
@@ -142,7 +150,38 @@
 					.attr('stroke', '#fff')
 					.attr("dy", 4);
 			obj.data('viz',obj.vis);
+			
+			
+			drawSliderHilight();
 		});
+		
+		
+		function drawSliderHilight(){
+			if ( $('#effin-graph > svg').length){
+				viz = $('#effin-graph').data('viz');
+				if ( !$('#effin-graph > svg > rect').length ){
+					var svgDocument = $('#effin-graph > svg')[0];
+					var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+					rect.setAttributeNS(null, "x", 0)
+					rect.setAttributeNS(null, "y", 0)
+					rect.setAttributeNS(null, "width",  0)
+					rect.setAttributeNS(null, "height",  0)
+					rect.setAttributeNS(null, "fill", "#0ff")
+					rect.setAttributeNS(null, "opacity", ".2")//stroke="black" stroke-width="2"
+					rect.setAttributeNS(null, "stroke", "#000")
+					rect.setAttributeNS(null, "stroke-width", "2");
+					svgDocument.appendChild(rect);
+				}
+				value = $('#slider').dragslider('option', 'values'); 
+				width_mult = (viz.options.width-viz.options.padding)/$('#slider').dragslider('option', 'max');
+				rect = $('#effin-graph > svg > rect');
+				rect.attr('x', (parseInt(viz.options.padding) + 0 + parseInt(value[0])*width_mult));
+				rect.attr('y', 0);
+				rect.attr('width', (value[1]-value[0])*width_mult);
+				rect.attr('height', viz.options.height-0-parseInt(viz.options.padding));
+			}
+		}
+		
 		
 		this.ddata = ddata;
 		
