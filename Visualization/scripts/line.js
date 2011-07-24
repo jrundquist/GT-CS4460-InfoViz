@@ -1,9 +1,13 @@
 (function($) {
 	
 	
+	/* 
+	 * Add this property to DOM elements, allowing 
+	 * us to easily draw a line chart on any element in the HTML page
+	 */
 	$.fn.d3InitEffingLineGraph = function(options) {
 		
-		
+		/// Default settings for the line chart
 		var defaults = {
 		   		languages: null,
 		   		data: null,

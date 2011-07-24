@@ -1,5 +1,12 @@
 /** 
  *  TwitViz
+ * 
+ * This is the custom library written to handle the map 
+ * 
+ * Initally it was going to contain all the code nessisary to run the 
+ * custom parts of the visualizations but after some working we found
+ * that it would be best if this section just worked the map, as it was 
+ * complex enough.
  */
 
 // shim layer with setTimeout fallback
@@ -13,20 +20,6 @@ window.requestAnimFrame = (function(){
 				window.setTimeout(callback, 1000 / 60);
 	};
 })();
-
-
-/** 
- * Clone method for making a copy of an object
- */
-// Object.prototype.clone = function() {
-//   var newObj = (this instanceof Array) ? [] : {};
-//   for (i in this) {
-//     if (i == 'clone') continue;
-//     if (this[i] && typeof this[i] == "object") {
-//       newObj[i] = this[i].clone();
-//     } else newObj[i] = this[i]
-//   } return newObj;
-// };
 
 
 
@@ -195,12 +188,8 @@ tv.Map = function(canvas, image){
 	}
 
 	this.canvas.width  = Math.round(Math.min($(this.canvas).width(),this.globe.width));
-	//$(this.canvas).width(this.canvas.width);
 	this.canvas.height = Math.round((this.globe.height/this.globe.width)*this.canvas.width);
-	//$(this.canvas).height(this.canvas.height);
-	
-	//this.canvas.s_width = this.canvas.width;
-	//this.canvas.s_height = this.canvas.height
+
 	this.canvas.x_offset = 0;
 	this.canvas.y_offset = 0;
 	this.canvas.view_width  = this.globe.width;
@@ -271,6 +260,9 @@ tv.Map.prototype.update = function(){
 
 }
 
+/* 
+ * Calls the ajax to load the data from the server 
+ */
 tv.Map.prototype.updateData = function(hs, ms, he, me){
 	sendData = {};
 	
@@ -305,7 +297,11 @@ tv.Map.prototype.updateData = function(hs, ms, he, me){
 
 	v = this;
 
-
+	/** 
+	 * Check to see if we have the data locally, 
+	 *   if we dont, then ajax it in and cache it
+	 *   otherwise load the data we have stored
+	 */
     this.db.transaction(
         function(tx) {
             tx.executeSql("SELECT `data` FROM MapCache WHERE `key`=?", [cacheKey],
@@ -420,7 +416,10 @@ tv.Map.prototype.drawData = function(){
 		
 	max_x = canvas.view_width*canvas.view_scale;
 	max_y = canvas.view_height*canvas.view_scale;
-			
+	
+	/* 
+	 * For each point of data in our data array 
+	 */	
 	for(var index in this.data){
 		point = this.data[index];
 
@@ -438,6 +437,9 @@ tv.Map.prototype.drawData = function(){
 
 		this.ctx.fillStyle = point.color || '#0ff';
 	
+		/*
+		 * If it is outside our current viewport, skip it 
+		 */
 		if ( p_x < 0 || p_x > max_x || p_y < 0 || p_y > max_y ){
 			continue;
 		}
@@ -477,6 +479,8 @@ tv.Map.prototype.drawData = function(){
 
 /**
  * setData(array)
+ * 
+ * Sets the data to the passed array
  */
 tv.Map.prototype.setData = function(data_array){
 
@@ -485,6 +489,11 @@ tv.Map.prototype.setData = function(data_array){
 	return this;
 }
 
+/**
+ * addDataPoint(point)
+ * 
+ * Adds the passed data to the existing data array
+ */
 tv.Map.prototype.addDataPoint = function(dat){
 	
 	try {
@@ -497,6 +506,13 @@ tv.Map.prototype.addDataPoint = function(dat){
 }
 
 
+/* 
+ * Details on demand
+ * 
+ * This method moves the tooltip to the point passed, 
+ * changes the content to be the details of the point, 
+ * and then fades in the tooltip
+ */
 tv.Map.prototype.showDetailsFor = function(data){	
 	
 	canvas = this.canvas;
@@ -528,8 +544,9 @@ tv.Map.prototype.showDetailsFor = function(data){
 
 
 
-
-
+/* 
+ * Preforms the zooming action based on the zoom, and mouse position
+ */
 tv.Map.prototype.preformZoom = function(zoom, mousex, mousey){
 	if ( this.canvas.view_scale * zoom > 50 ){
 		return;
@@ -564,7 +581,9 @@ tv.Map.prototype.preformZoom = function(zoom, mousex, mousey){
 	this.tick();
 }
 
-
+/* 
+ * Handles checking to see if the user has clicked on a drawn data point 
+ */
 tv.Map.prototype.mouseClick = function (event){
 	$('section#tooltip').hide();
 	
@@ -616,6 +635,7 @@ tv.Map.prototype.mouseClick = function (event){
 	
 }
 
+
 tv.Map.prototype.mouseDown = function (event){
 	var mousex = event.clientX - $(this).offset().left;
     var mousey = event.clientY - $(this).offset().top;
@@ -626,6 +646,10 @@ tv.Map.prototype.mouseDown = function (event){
 	this.mousey = mousey;
 	
 }
+
+/* 
+ * Handles dragging of the map 
+ */
 tv.Map.prototype.mouseMove = function (event){
 	
 	if ( !this.mousedownnow ){
@@ -663,12 +687,20 @@ tv.Map.prototype.mouseUp = function (event){
 	this.style.setProperty({cursor:'pointer'});
 	
 }
+
+/* 
+ * Zoom on double click event 
+ */
 tv.Map.prototype.mouseDblClick = function (event){
 	var mousex = event.clientX - $(this).offset().left;
     var mousey = event.clientY - $(this).offset().top;
 	
 	this.map.preformZoom(1.5, mousex, mousey);
 }
+
+/** 
+ * zoom based on mouse wheel event
+ */
 tv.Map.prototype.mouseWheel = function (event){
     var mousex = event.clientX - $(this).offset().left;
     var mousey = event.clientY - $(this).offset().top + $(window).scrollTop();

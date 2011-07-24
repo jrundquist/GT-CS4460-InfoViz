@@ -1,7 +1,11 @@
 (function($) {
 	
-	
+	/* 
+	 * Add this property to DOM elements, allowing 
+	 * us to easily draw a pie chart on any element in the HTML page
+	 */
 	$.fn.d3InitPieGraph = function(options) {
+		// Default options
 		var defaults = {
 		   		languages: null,
 		   		data: [{"data":{"count":"120060"},"name":"en"}, {"data":{"count":"26096"},"name":"ja"},{"data":{"count":"16562"},"name":"es"},  {"data":{"count":"8018"},"name":"pt"},{"data":{"count":"1480"},"name":"ko"},   {"data":{"count":"971"},"name":"fr"}, {"data":{"count":"667"},"name":"de"},{"data":{"count":"531"},"name":"tr"},	{"data":{"count":"494"},"name":"ru"},{"data":{"count":"449"},"name":"it"}],
@@ -15,9 +19,6 @@
 		var options = $.extend(defaults, options);
 			
 			
-		
-		
-		
 		return this.each(function(){
 			this.options = options;
 			
@@ -33,10 +34,10 @@
 			for (i = 0; i < this.options.data.length; i++)
 				percentData[i] = parseInt(this.options.data[i].data.count)/total;
 			
+			
+			/* D3 Magic */
 		    pieData = d3.layout.pie().sort(d3.descending);
-		
-		
-		
+
 		    arc = d3.svg.arc().innerRadius(this.options.radius * 0).outerRadius(this.options.radius*.8); // affects inner and outer radii
 				
 			var vis = d3.select(this.options.what)

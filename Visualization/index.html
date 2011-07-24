@@ -2,11 +2,7 @@
 <html>
 <head>
 	<title>TwitViz Map Demo</title>
-	
-	
-<!-- 	<script src="scripts/uglied.js"></script>
-	 -->
-	
+
 	<script src="scripts/jquery.min.js"></script>
 	<script src="scripts/jquery-ui.min.js"></script>
 	<script src="scripts/jquery-ui.slider.rangeDrag.js"></script>
@@ -33,20 +29,19 @@
 
 </head>
 <body>
+	
+	<!-- Tooltip -->
 	<section id="tooltip">
 	</section>
 	
+	<!-- Header information -->
 	<header id="intro">
 		<h1>tWhere in Tweet tWorld</h1>
 		<h2>Visualizing Global Twitter Data</h2>
 	</header>
 	
-	
-	
-	
 	<article role="main">
 		
-		<!-- Tooltip -->
 		
 		<!-- Data map showing the geographic data -->
 		<section id="geo-map">
@@ -80,6 +75,7 @@
 			</section>
 		</section>
 		
+		<!-- Lets filter some data ! -->
 		<article id="filters">
 			<header>
 				<h1>Filter Tweet Data</h1>
@@ -88,6 +84,7 @@
 				<header>
 					<h3>Select Languages</h3>
 				</header>
+				<!-- Split the options into two columns -->
 				<div id="lang-options">
 					<form id="lang-form">
 					<div id="left-col-choices">
@@ -107,6 +104,8 @@
 					</form>
 				</div>
 			</section>
+			
+			<!-- Section including the play/pause button -->
 			<section id="map-play">
 				<header> 
 					<h3>Map Time</h3>
@@ -117,6 +116,7 @@
 			</section>
 		</article>
 		
+		<!-- Pie chart showing languages -->
 		<section id="chart">
 			<h2>Languages</h2>
 			<div id="pie"></div>
@@ -127,25 +127,34 @@
 		
 	</article>
 	
-	
-	<footer>
-	</footer>
-	
 	<script>	
+	
+	
+		// When the document loads run the following function
 		$(document).ready(function(){
 			
+			/* 
+			 * Dynamically color the key markers based on the language
+			 */
 			
+
 			$('.key').each(function(){
 				$(this).css({'border-color':'transparent '+langs[$(this).attr('lang')].color+' transparent transparent'});//'+langs[$(this).attr('lang')].color});
 			});
 			
-			
+			/* 
+			 * Create the map 
+			 */
 			window.vizMap = tv.map(null, $('#map-image')).draw();
-			// //mapPlay(0, 0, 0, 0);
+			window.vizMap.updateData(6, 00, 7, 00);
+
+			/* 
+			 * When a language is clicked, toggle it from the map and redraw
+			 */
 			$('#lang-form input[type="checkbox"]').each(function(){
 				$(this).change(function(){
 					window.vizMap.updateData(null, null, null, null);
-					
+					// Make the call to the line graph to re-draw
 					$.ajax({
 						url: 'ajax/lang-trends.php',
 						dataType: 'json',
@@ -157,8 +166,15 @@
 					
 				});
 			});
-			window.vizMap.updateData(6, 00, 7, 00);
+			
+			/* 
+			 * Fake a call to the language checkbox, just to trigger the nessisary drawing events 
+			 */
 			$('#lang-form input[type="checkbox"]').first().change();
+			
+			/* 
+			 * Initalize the pie chart, using the hard coded data values for all langs for all 24 hours
+			 */
 			$('#pie').d3InitPieGraph({languages: langs, width: 500, height: 600, radius: 250});
 
 		});

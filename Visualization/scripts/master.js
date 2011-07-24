@@ -65,7 +65,7 @@ var langs = {
 
 
 
-
+// Toggles play/pause based on the play-pause button
 function togglePlaying(){
 	current = $('#play-pause').attr('playing');
 	
@@ -80,7 +80,10 @@ function togglePlaying(){
 
 
 
-
+/* 
+ * Function that is called to increment the slider while the 
+ * map is in play mode
+ */
 function mapPlay(){
 	can_play = $('#play-pause').attr('playing');
 	if ( can_play == 'true' ){		
@@ -101,6 +104,9 @@ function mapPlay(){
 }
 
 
+/* 
+ * Preforms the nessisary actions to brush to a language 
+ */
 function brushLang(lang){
 
 	$('path.pie-piece').each(function(){
@@ -122,6 +128,9 @@ function brushLang(lang){
 	$('#lang-line-'+lang).stop().animate({opacity: 1.5, strokeWidth: 6},1000);
 }
 
+/* 
+ * Called when we want to reset the display (un-brushing) the charts
+ */
 function unBrush(lang){
 	
 	$('path.pie-piece').each(function(){

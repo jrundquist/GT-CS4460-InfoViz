@@ -166,43 +166,22 @@ $(function()
 									Math.floor(value[0]/12), ((value[0]-(Math.floor(value[0]/12)*12))*5), 
 									Math.floor(value[1]/12), ((value[1]-(Math.floor(value[1]/12)*12))*5)
 									);
-			$.ajax({
-				url: 'ajax/lang-count.php',
-				dataType: 'json',
-				data: {
-						hs: Math.floor(value[0]/12),
-						ms: ((value[0]-(Math.floor(value[0]/12)*12))*5),
-						he: Math.floor(value[1]/12),
-						me: ((value[1]-(Math.floor(value[1]/12)*12))*5)
-				},
-				success: function(rawData){
-					
-					//$('#pie').html("").d3InitPieGraph({languages: langs, data: rawData, width: 500, height: 600, radius: 250});
-					
-					/**
-					if ( !rawData )
-					return;
-										
-					total = 0;
-					for (i = 0; i < rawData.length; i++)
-						total += parseInt(rawData[i].data.count);
-					// Make array of percentages representative of each language
-					percentData = new Array();
-					for (i = 0; i < rawData.length; i++)
-						percentData[i] = parseInt(rawData[i].data.count)/total;
+			// Skip this since we will not be updating the pie chart based on the slider
+			if ( false ) {
+				$.ajax({
+					url: 'ajax/lang-count.php',
+					dataType: 'json',
+					data: {
+							hs: Math.floor(value[0]/12),
+							ms: ((value[0]-(Math.floor(value[0]/12)*12))*5),
+							he: Math.floor(value[1]/12),
+							me: ((value[1]-(Math.floor(value[1]/12)*12))*5)
+					},
+					success: function(rawData){
 
-				    pieData = d3.layout.pie().sort(d3.descending);
-				
-				
-				
-					viz = $('#pie').data('viz');
-					//viz.data(pieData).transition();
-					viz.arcs.data(pieData).transition();
-					viz.paths.data(pieData).transition();
-					
-					**/
-				}
-			});
+					}
+				});
+			}
 		},
 		stop: function(event, ui)//When slider stops
 		{
